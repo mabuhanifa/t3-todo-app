@@ -38,6 +38,7 @@ export const todoRouter = createTRPCRouter({
       },
     });
   }),
+
   delete: publicProcedure.input(z.string()).mutation(({ ctx, input }) => {
     return ctx.prisma.todo.delete({
       where: {
@@ -45,4 +46,22 @@ export const todoRouter = createTRPCRouter({
       },
     });
   }),
+
+  toggle: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        done: z.boolean(),
+      })
+    )
+    .mutation(({ ctx, input: { id, done } }) => {
+      return ctx.prisma.todo.update({
+        where: {
+          id,
+        },
+        data: {
+          done,
+        },
+      });
+    }),
 });
