@@ -52,14 +52,14 @@ export const authOptions: NextAuthOptions = {
         port: 587,
         auth: {
           user: "apikey",
-          pass: process.env.EMAIL_PASSWORD || "",
+          pass: process.env.EMAIL_API_KEY,
         },
       },
-      from: process.env.EMAIL_FROM || "default@default.com",
-      ...(process.env.NODE_ENV !== "development"
+      from: process.env.EMAIL_FROM || "test@localhost.com",
+      ...(process.env.NODE_ENV !== "production"
         ? {
             sendVerificationRequest({ url }) {
-              console.log(`LOGIN LINK: ${url}`);
+              console.log("LOGIN LINK", url);
             },
           }
         : {}),
