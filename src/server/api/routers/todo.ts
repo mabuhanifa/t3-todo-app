@@ -1,8 +1,4 @@
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 export const todoRouter = createTRPCRouter({
   all: publicProcedure.query(async ({ ctx }) => {
@@ -29,5 +25,17 @@ export const todoRouter = createTRPCRouter({
     ];
   }),
 
-  create: protectedProcedure.input().mutation(async ({ ctx }) => {}
-);
+  create: protectedProcedure.input(todoInput).mutation(({ ctx, input }) => {
+    // throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+    return ctx.prisma.todo.create({
+      data: {
+        text: input,
+        user: {
+          connect: {
+            id: ctx.session.user.id,
+          },
+        },
+      },
+    });
+  }),
+});
