@@ -1,25 +1,33 @@
-import { z } from "zod";
-
 import {
   createTRPCRouter,
-  publicProcedure,
   protectedProcedure,
+  publicProcedure,
 } from "~/server/api/trpc";
 
-export const exampleRouter = createTRPCRouter({
-  hello: publicProcedure
-    .input(z.object({ text: z.string() }))
-    .query(({ input }) => {
-      return {
-        greeting: `Hello ${input.text}`,
-      };
-    }),
-
-  getAll: publicProcedure.query(({ ctx }) => {
-    return ctx.prisma.example.findMany();
+export const todoRouter = createTRPCRouter({
+  all: publicProcedure.query(async ({ ctx }) => {
+    const todos = await ctx.prisma.todo.findMany({
+      where: {
+        userId: ctx?.session?.user.id,
+      },
+    });
+    console.log(
+      "todos from prisma",
+      todos.map(({ id, text, done }) => ({ id, text, done }))
+    );
+    return [
+      {
+        id: 2,
+        text: "test",
+        done: false,
+      },
+      {
+        id: 1,
+        text: "test 2",
+        done: true,
+      },
+    ];
   }),
 
-  getSecretMessage: protectedProcedure.query(() => {
-    return "you can now see this secret message!";
-  }),
-});
+  create: protectedProcedure.input().mutation(async ({ ctx }) => {}
+);
